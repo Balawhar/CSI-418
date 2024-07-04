@@ -1,0 +1,6 @@
+
+ALTER TABLE your_table ADD new_column_name new_data_type;
+UPDATE your_table SET new_column_name = original_column_name;
+COMMIT;
+ALTER TABLE your_table DROP COLUMN original_column_name;
+ALTER TABLE your_table RENAME COLUMN new_column_name TO original_column_name;

@@ -1,0 +1,50 @@
+export ORACLE_SID=bobfidev
+export ORACLE_HOME=/u02/app/oracle/product/12.2.0.1/db_1
+export PATH=$PATH:$ORACLE_HOME/bin
+export SYS_PSWD=sys12_DB_bobfidev
+export SYSTEM_PSWD=system12_DB_bobfidev
+export TODAY_DT=$(date --date="today" +"%d%m%Y")
+export PRDAY_DT=$(date --date="yesterday" +"%d%m%Y")
+export DB_BACKUP_PATH='/u01/Backup'
+export DUMP_DIR_NAME=DBPUMP
+export DB_NAME=bobfidev
+export HOSTID=10162
+export DTWTM=`date +%d%m%Y_%H%M%S`
+export ZDMPF=${DB_NAME}_${DTWTM}_${HOSTID}_%U.dmp
+export ZLOGF=Log_${DB_NAME}_${DTWTM}.log
+
+#echo "DB enable restricted mode."
+#alter system enable restricted session;
+
+sqlplus sys/${SYS_PSWD} as sysdba <<EOF
+create or replace directory ${DUMP_DIR_NAME} as '${DB_BACKUP_PATH}';
+grant read, write on directory ${DUMP_DIR_NAME} to public;
+exit
+EOF
+
+rm Log_${DB_NAME}_*.log
+
+expdp \"sys/${SYS_PSWD} as sysdba\" directory=DBPUMP \
+dumpfile=$ZDMPF exclude=statistics \
+full=y filesize=3000M logfile=$ZLOGF <<EOF
+EOF
+
+#echo "DB disable restricted mode."
+#sqlplus sys/${SYS_PSWD} as sysdba <<EOF
+#alter system disable restricted session;
+#exit
+#EOF
+
+cd $DB_BACKUP_PATH
+
+if grep -q "successfully" $ZLOGF; then
+  echo "Zipping dumps..."
+  rm ${DB_NAME}_*.tar.gz
+  tar -cvzf ${DB_NAME}_${DTWTM}_${HOSTID}.tar.gz --remove-files ${DB_NAME}_${DTWTM}_${HOSTID}_*.dmp
+  #zip -9 -m ${DB_NAME}_${DTWTM}_${HOSTID}.zip ${DB_NAME}_${DTWTM}_${HOSTID}_*.dmp
+  echo "Zip done."
+else
+  echo "Check logfile for ORA errors..."
+fi
+
+#example of decompress: tar -xvf ${DB_NAME}_${DTWTM}_${HOSTID}.tar.gz

@@ -1,0 +1,76 @@
+---------------------------------- Postgres --------------------------------------------------------------
+-- Connect to PostgreSQL with postgres user ( plpgSQL )
+psql -U postgres -d testdb2  
+--psql -U postgres -d <your_database_name>
+====================================================================================================================
+-- Backup ------------------------------------------------------------------------------------------------
+-- Single Backup ( Dump )
+-- Backup Compressed SQL format with (-F c)
+pg_dump -U postgres -h 10.10.10.70 -d testdb2 -F c -b -v -f /u01/pgsql/test_backups/testdb2_29052024_bck.sql
+-----------------------------------
+-- Restore Compressed Single Backup
+pg_restore -U postgres -h 10.10.10.70 -d testdb -v /u01/pgsql/test_backups/testdb2_29052024_bck.sql
+-- pg_restore -U postgres -h <  ip  > -d <newDB> -v /u01/pgsql/test_backups/<backupname>
+-----------------------------------------------------------------------------------------------------
+-- Single TABLE Backup
+pg_dump -U postgres -h 10.10.10.70 -d testdb2 -F c -b -v -t your_table_name -f /u01/pgsql/test_backups/your_table_name_29052024_bck.sql
+-----------------------------------
+-- Single TABLE Restore
+pg_restore -U postgres -h 10.10.10.70 -d testdb2 -v -t employees /u01/pgsql/test_backups/employees_29052024_bck.sql
+--
+====================================================================================================================
+-- Query from outside pgsql ( formatted in organized way ) ---------------------------------------
+psql -U postgres -d V21 -c "SELECT * FROM sdedba.ref_com_country;" -t -A
+
+-- Query from outside pgsql ( formatted in more sophisticated and organized way ) ----------------
+psql -U postgres -d V21 -c "\x on" -c "SELECT * FROM sdedba.ref_com_country;"
+
+====================================================================================================================
+-- Restart postgresql Service
+sudo systemctl restart postgresql
+--------------------------------------------------------------------------------------------------
+setfacl -m u:username:w /u01/pgsql/test_backups  
+-- This setup ensures that the directory is accessible only to the owner and the specified user with write-only permission.
+--------------------------------------------------------------------------------------------------
+-- Crontab
+0 2 * * * /usr/bin/pg_dump -U postgres -h localhost -d mydatabase -F c -b -v -f /path/to/backup/mydatabase_$(date +\%Y\%m\%d).backup
+====================================================================================================================
+-- Tables of all tables
+select * from pg_stat_all_tables;
+select * from pg_tables;
+====================================================================================================================
+-- Show hidden files
+ls -ltra
+--------------------
+pg_config --sysconfdir
+====================================================================================================================
+-- Example: Resetting login attempts or other conditions (if implemented via custom mechanisms).
+UPDATE pg_authid SET rolcanlogin = TRUE WHERE rolname = 'suitedba';
+-- To unlock the account, you can reset the password expiration.
+ALTER ROLE suitedba VALID UNTIL 'infinity';
+====================================================================================================================
+-- Check if the table exists
+SELECT table_name
+FROM information_schema.tables
+WHERE table_name = 'ref_com_commission';
+====================================================================================================================
+-- Creating a New User with Specific Privileges
+CREATE USER new_user WITH PASSWORD 'password';
+GRANT CONNECT ON DATABASE your_database TO new_user;
+GRANT USAGE ON SCHEMA public TO new_user;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO new_user;
+====================================================================================================================
+
+
+====================================================================================================================
+
+
+====================================================================================================================
+
+
+====================================================================================================================
+
+
+====================================================================================================================
+
+====================================================================================================================

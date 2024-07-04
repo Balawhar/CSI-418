@@ -1,0 +1,78 @@
+####################################### General Linux Commands ############################################
+
+# Show hidden files #
+ls -ltra
+
+pam_tally2 --user=username  # Display failed login attempts for a user
+pam_tally2 --user=username --reset  # Reset the tally for a user
+
+lsblk # List information about block devices
+
+echo "command" | at 12:34  # Schedule a command to run at 12:34
+
+opreport -l /path/to/binary  # Generate a detailed report for a specific binary
+
+# move files from one directory to another
+sudo find /source_directory -user root -exec mv {} /destination_directory/ \;
+
+###########################################################################################################
+
+### Security & Login ###
+
+perf stat <command> # Collect statistics for a specific command
+
+gpg -c file  # Encrypt file
+gpg file.gpg  # Decrypt file
+
+#scp: Secure copy (remote file copy program)
+scp file user@hostname:/path/to/destination
+scp user@hostname:/path/to/file /local/destination
+
+#rsync: Remote file and directory synchronization
+rsync -avz source/ user@hostname:/path/to/destination/
+
+#ssh: OpenSSH SSH client (remote login program)
+ssh user@hostname
+ssh -i /path/to/private_key user@hostname
+
+###########################################################################################################
+
+###Advanced Networking ###
+
+#curl: Transfer data from or to a server using various protocols
+curl -O http://example.com/file  # Download file
+curl -X POST -d "param=value" http://example.com/resource  # HTTP POST request
+
+#nc (netcat): Networking utility for reading/writing network connections
+nc -l 12345  # Listen on port 12345
+nc hostname 12345  # Connect to hostname on port 12345
+
+ip link show
+ip addr show
+ip route show
+
+###########################################################################################################
+
+### Advanced File Manipulation ###
+
+sed 's/old/new/g' file.txt  # Replace 'old' with 'new' in a file
+
+find . -name "*.txt" | xargs rm  # Find and remove all .txt files
+
+split -b 100M largefile  # Split file into 100MB chunks
+
+command | tee output.txt  # Save output to file and display it
+
+awk '{print $1}' file.txt  # Print first column of a file
+
+###########################################################################################################
+
+### KVM (Kernel-based Virtual Machine) ###
+
+virsh list --all  # List all virtual machines
+virsh start vm_name  # Start a virtual machine
+virsh shutdown vm_name  # Shut down a virtual machine
+virsh console vm_name  # Access a virtual machine's console
+
+###########################################################################################################
+

@@ -1,0 +1,17 @@
+
+-- 13/03/2024 -- 
+ALTER TABLE sdedba.ref_com_document_config RENAME COLUMN TECH_MEDIA_ID TO MEDIA_ID;
+SELECT TECH_MEDIA_ID FROM ssdx_tmp.ref_com_document_config_BCK20240313;
+SELECT MEDIA_ID FROM ssdx_tmp.ref_com_document_config;
+--------------------------------------------------------------
+-- 14/03/2024 -- 
+ALTER TABLE sdedba.ref_com_document_config RENAME COLUMN TECH_MEDIA_ID TO MEDIA_ID;
+CREATE TABLE SSDX_TMP.ref_com_document_config_BCK_20240314 AS
+select * from sdedba.ref_com_document_config;
+SELECT MEDIA_ID FROM ssdx_tmp.ref_com_document_config;
+-------------------------------------------------------------
+-- 15/03/2024 -- 
+ALTER TABLE sdedba.ref_com_document_config RENAME COLUMN MEDIA_ID TO TECH_MEDIA_ID;
+CREATE TABLE SSDX_TMP.ref_com_document_config_BCK_20240315 AS
+select * from sdedba.ref_com_document_config;
+SELECT TECH_MEDIA_ID FROM sdedba.ref_com_document_config;

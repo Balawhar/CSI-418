@@ -1,0 +1,40 @@
+Cluster name :BalawharTest1
+--
+Password : RootRootRoot2024!
+--
+Postgres Version : 16
+--
+Project number : 1096713228432
+--
+application_name : PostgresTest1
+================
+--------------CONNECTION INFO----------------
+--
+CONNECTION STRING:
+psql "postgres://edb_admin@p-2wf7me8axn.private.pg.biganimal.io:5432/edb_admin?sslmode=require"
+--
+Read/write URL
+postgres://edb_admin@p-2wf7me8axn.private.pg.biganimal.io:5432/edb_admin?sslmode=require
+--
+Dbname: edb_admin
+--
+Read/write Host
+p-2wf7me8axn.private.pg.biganimal.io
+--
+Port: 5432
+--
+User edb_admin
+--
+Role: postgres
+--
+Service: postgres
+--
+.PG_SERVICE.CONF BLOB :
+[edb_admin]
+host=p-2wf7me8axn.private.pg.biganimal.io
+port=5432
+user=edb_admin
+
+----------------------------------------------
+psql -h <your_hostname_or_ip> -p 5432 -U <username> -W <password> your_database_name
+----------------------------------------------

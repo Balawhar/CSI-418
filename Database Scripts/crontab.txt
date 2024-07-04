@@ -1,3 +1,0 @@
-00 22 * * 1-5 /u01/Backup/scripts/bobfidev_bck.sh >/u01/Backup/Log_bobfidev 2>&1
-#00 22 * * 1-5 /u01/Backup/scripts/bobfitst_bck.sh >/u01/Backup/Log_bobfitst 2>&1
-#00 22 * * 1-5 /u01/Backup/scripts/fransadev_bck.sh >/u01/Backup/Log_fransadev 2>&1

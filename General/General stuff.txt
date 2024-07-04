@@ -1,0 +1,36 @@
+============================================ General Stuff ===============================================
+
+--------- MTB ------------
+MTBUAT is our environment so to change system and sys password if they are expired create 'refresh_sys.sql'
+with those in it :
+refresh user sys identified by sys@...
+refresh user system identified by system@...
+and use the command @refresh_sys.sql in sqlplus
+
+========================================================================================
+--------- ARABIA -----------
+
+-- UAT --
+AMLTODBC1
+
+========================================================================================
+-------- BOBFINANCE --------
+
+Session 1
+Zoom code = 446 403 9935
+Zoom password = B0BF!n@nce
+
+Session 2
+Zoom code = 4647395369
+Zoom password = 509214
+
+-- UAT --
+10.11.150.200 ( IP )
+BOBF60DB ( Database )
+bobitseg20 ( PC )
+--
+
+--PROD
+BOBF01DB
+
+========================================================================================

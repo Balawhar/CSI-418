@@ -1,0 +1,64 @@
+------------ done once no need to do it again.....
+--export ORACLE_SID=dbc19c
+--sqlplus / as sysdba
+
+--alter system set audit_trail=none scope=spfile;
+--alter system set db_files=5000 scope=spfile;
+
+--refresh sys/system (by Container)
+--@dbc19c_refresh_sys.sql
+--shut immediate
+--startup
+---------------------------------------------
+
+-- start from herer for next db...
+
+show pdbs
+alter session set container = vbssuite;
+
+shut immediate
+startup upgrade
+
+alter system set MAX_STRING_SIZE='EXTENDED' SCOPE=BOTH;
+@?/rdbms/admin/utl32k.sql
+
+shut immediate
+startup
+show parameter max_string
+
+alter session set container = vbssuite;
+-- create tbs / <dbanme? -- ex: @vbssuite_create_tbs.sql
+
+select * from v$datafile
+
+CREATE OR REPLACE DIRECTORY "DBPUMP" as '/u01/Backup';
+GRANT read,write on DIRECTORY "DBPUMP" to public;
+
+exit
+
+------------------------------------------------------
+-- Import from OS
+nohup impdp system/system19_DB_dbc19c@vbssuite \
+directory=DBPUMP full=y table_exists_action=replace \
+dumpfile=1064_vbssuite_090224_222002.dmp \
+logfile=imp_vbssuite.log &
+
+------------------------------------------------------
+
+-- SQL
+-- refresh sys/system
+-- refresh users
+alter session set container = arabiadev
+spool arabiadev_refresh_users.sql;
+select 'alter user '||username||' identified by '||lower(username)||' account unlock;' from dba_users
+where username not in ('SYS','SYSTEM','XS$NULL');
+spool off;
+
+spool elbdev_refresh_users.sql;
+select 'alter user '||username||' identified by '||lower(username)||' account unlock;' from dba_users
+where username not in ('SYS','SYSTEM','XS$NULL');
+spool off;
+
+
+
+

@@ -1,0 +1,59 @@
+############################################### GENERAL #############################################
+
+# Show hidden files #
+ls -ltra
+#
+ls -lsrth    -- instead of ll ( for MB info )
+
+export ORACLE_SID=blfdev
+sqlplus / as sysdba
+
+-- Pass example of sys and system --
+
+sys/sys12_DB_blfdev@blfdev as sysdba
+system/system12_DB_blfdev@blfdev
+
+unzip for .zip
+gzip -d for .gz ( decompress )
+gzip -c for .gz ( compress )
+%U to take all dumps
+
+-- Configuring the tnsnames.ora / listener.ora --
+cd $ORACLE_HOME
+cd network/admin/
+ll  then vi tnsnames.ora to create the new tns by copying an existing one and changing names
+-- then do 
+lsnrctl reload
+lsnrctl status
+else configure it through
+netca
+netmgr
+
+-- you can do this step through WinSCP -- OR by this inside mobaX --
+sed -i 's/oldtext/newtext/g' yourfile      -- used to replace words in a file ( tablespace usually )
+
+ps -ef | grep impdp/expdp	-- to check the import id
+kill -9 <PID>     			-- <PID> is the id of the impdp
+
+
+------- TABLESPACE --------------------------------------------------------------
+
+ps -ef | grep pmon
+cat /etc/oratab			-- to list the Databases
+show parameter db_name  -- in sqlplus to show the DB im in
+
+du -sm /u01/app/oracle/oradata/cvstrdts/	-- to show the in GB the data when creating tablespaces
+du -sh /u01/app/oracle/oradata/cvstrdts/	-- to show the in GB the data when creating tablespaces
+
+ll /u01/app/oracle/oradata/cvstrdts/	-- to show the the tablespaces created
+ls /u01/app/oracle/oradata/cvstrdts/	-- to show the the tablespaces created
+ls -lrsth /u01/app/oracle/oradata/rtlsvtdv/	   -- show the size of each file ( Tablespaces created too )
+
+DROP TABLESPACE undotbs1 INCLUDING CONTENTS AND DATAFILES;
+
+-------------------------------------------------------------------------------
+
+-- if pluggable -- Container --
+-- SQL
+show pdbs								   -- show all pluggable dbs
+alter session set container = blfdev;      -- blfdev is an ex of dbname your working on

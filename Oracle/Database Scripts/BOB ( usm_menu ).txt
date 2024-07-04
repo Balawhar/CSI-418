@@ -1,0 +1,7 @@
+update usm_menu set menu_managed = 1
+where menu_variable like 'isDataBaseLicense'
+and menu_managed = 0;
+
+commit;
+
+select * from usm_menu where menu_variable like 'isDataBaseLicense';

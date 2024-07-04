@@ -1,0 +1,4 @@
+-- refresh users
+spool db_refresh_users.sql;
+select 'alter user '||username||' identified by '||lower(username)||' account unlock;' from dba_users;
+spool off;
