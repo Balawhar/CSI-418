@@ -65,6 +65,15 @@ command | tee output.txt  # Save output to file and display it
 
 awk '{print $1}' file.txt  # Print first column of a file
 
+
+*****
+locate
+whereis
+find
+show
+******
+SHOW config_file;
+
 ###########################################################################################################
 
 ### KVM (Kernel-based Virtual Machine) ###

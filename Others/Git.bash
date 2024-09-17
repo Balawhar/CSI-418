@@ -11,7 +11,7 @@ git init
 git remote -v
 
 # Add Remote Repository / This command adds a remote named 'origin' with the specified URL
-$ git remote add origin https://github.com/Balawhar/General_Repo.git
+git remote add origin https://github.com/Balawhar/General_Repo.git
 
 # Set Remote URL / This command updates the URL of the existing remote named 'origin
 git remote set-url origin https://github.com/Balawhar/General_Repo.git

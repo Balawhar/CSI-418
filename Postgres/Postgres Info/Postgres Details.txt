@@ -1,0 +1,29 @@
+-- ###################################### PostgreSQL ######################################## --
+
+-- cat ../pg_dbs_backup.sh
+-- RedHat Linux 8.9
+-- PostgreSQL 16.3
+-- sudo dnf install ( for installations )
+-- SELECT pg_reload_conf();
+-- psql -U postgres -d postgres -- SHOW config_file;
+-- /u01/pgsql/16/data/postgresql.conf
+-- sudo systemctl restart postgresql-16 ( -- stop -- start )
+-- echo $PG_CONFIG /usr/pgsql-16/bin/pg_config
+
+To search for something:
+- locate
+- whereis
+- find
+- which
+
+# Add settings for extensions here
+shared_preload_libraries = 'pg_cron, pg_stat_statements'
+cron.database_name = 'postgres'
+cron.nodename = ''                              #localhost
+#log_min_messages = info
+#log_directory = '/u01/pgsql/16/data/pg_log'    # Directory where logs will be stored
+#log_filename = 'pg_cron-%Y-%m-%d_%H%M%S.log'   # Log file name pattern
+
+
+
+

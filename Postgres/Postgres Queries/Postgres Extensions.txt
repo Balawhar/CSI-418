@@ -1,0 +1,174 @@
+Postgres Installed Extensions:
+Databases:
+vcisdb
+mtbdb
+----------------------------------------------------------------------------------
+pgcron:
+
+Functionalities
+- Scheduling, Managing, and Monitoring Jobs
+- Handling Job Failures
+- Configuration Options
+- Security and Permissions
+
+Common Usages:
+- Database Maintenance
+- Backups
+- Data Refreshing
+- Monitoring and Alerts
+- Data Processing
+- Custom Scripts
+
+----------------------------------------------------------------------------------
+PostGIS:
+*postgis_topology ( adds support for raster data in PostGIS, enabling you to store, query, and analyze raster (gridded) data, such as satellite imagery, elevation models, and other pixel-based datasets )
+
+Functionalities
+- Spatial Data Types
+- Spatial Functions
+- Spatial Indexing
+- Spatial Queries
+- Coordinate Transformations
+- Geocoding and Reverse Geocoding
+- Geospatial Analysis
+- Data Import and Export
+
+Common Usages:
+- Mapping Applications
+- Geocoding and Address Management
+- Urban Planning and GIS
+- Transportation and Logistics
+- Agriculture and Land Management
+- Disaster Response and Management
+
+----------------------------------------------------------------------------------
+pg_stat_statements:
+
+Functionalities:
+- Query Tracking
+- Performance Metrics
+- Aggregated Data
+- Resetting Statistics
+- Index and Table Usage
+
+Common Usages:
+- Identifying Slow Queries
+- Optimizing Query Performance
+- Monitoring Query Activity
+- Database Tuning
+- Benchmarking
+- Understanding Query Patterns
+
+----------------------------------------------------------------------------------
+postgres_fdw:
+
+Functionalities:
+- Foreign Servers
+- User Mapping
+- Foreign Tables
+- Data Access
+- Foreign Data Modifications
+- Optimization
+
+Common Usages:
+- Data Federation
+- Data Migration
+- Reporting and Analysis
+- Distributed Systems
+- Legacy Systems Integration
+- Real-time Data Access
+
+----------------------------------------------------------------------------------
+fuzzystrmatch:
+
+Functionalities:
+- Soundex
+- Metaphone
+- Damerau-Levenshtein Distance
+- Levenshtein Distance
+- Jaro-Winkler Distance
+
+Common Usages:
+- Data Cleaning
+- Search and Retrieval
+- Deduplication
+- Data Integration
+- Fuzzy Matching in User Input
+- Similarity Analysis
+
+----------------------------------------------------------------------------------
+pg_trgm
+
+Functionalities:
+- Trigram Similarity
+- Similarity Search
+- Word Similarity
+- Set Limit for Similarity
+- Trigram Matching
+- Trigram Indexes
+
+Common Usages:
+- Fuzzy Text Search
+- Data Deduplication
+- Improved Pattern Matching
+- Name Matching
+- Text Analytics
+- Natural Language Processing (NLP)
+- Address Standardization
+
+----------------------------------------------------------------------------------
+dblink
+
+Functionalities:
+- Connect to Remote Databases
+- Execute Remote Queries
+- Simple Queries without Persistent Connections
+- Return Result Sets
+- Insert, Update, and Delete
+- Connection Management
+- Check Connection Status
+
+Common Usages:
+- Cross-Database Queries
+- Data Migration
+- Remote Data Analysis
+- Distributed Systems
+- Legacy System Integration
+- Remote Database Administration
+- Federated Data Access
+
+----------------------------------------------------------------------------------
+citext
+
+Functionalities:
+- Case-Insensitive Comparisons
+- Case-Insensitive Pattern Matching
+- Case-Insensitive Indexing
+- Case-Insensitive Sorting
+- Function Support
+
+Common Usages:
+- Usernames and Emails
+- Case-Insensitive Email Addresses
+- Searchable Fields
+- Natural Language Data
+- Avoiding Redundant LOWER() Calls
+- Collaboration and Communication Tools
+- Web Forms and Inputs
+
+----------------------------------------------------------------------------------
+tablefunc
+
+Functionalities:
+- Crosstab Function (Pivot Table)
+- Crosstab with a Category Field 
+- Normal Random Function
+- Connectby Function
+- Multicorn Function
+
+Common Usages:
+- Creating Pivot Tables
+- Hierarchical Data Queries
+- Simulating Data with Random Functions
+- Complex Aggregation and Reporting
+- Analyzing Time-Series Data

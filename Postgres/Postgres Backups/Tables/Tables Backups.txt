@@ -1,0 +1,5 @@
+VDPS: ssdx_tmp.tmp_fin_transaction_20240826
+
+VDPS: sdedba: ssdx_eng.ref_customer_misc_info_bck_20240826
+
+VDPS: sdedba: ssdx_eng.ref_customer_misc_info_20240826

@@ -1,4 +1,4 @@
--- ### Check Size of Tables in every Schema ### --
+-- ### Check Size of every Table in every Schema ### --
 
 CREATE OR REPLACE FUNCTION analyze_disk_usage()
 RETURNS TABLE(table_name TEXT, total_size BIGINT, table_size BIGINT, index_size BIGINT, toast_size BIGINT) AS $$
@@ -20,9 +20,9 @@ $$ LANGUAGE plpgsql;
 -- Usage:
 SELECT * FROM analyze_disk_usage();
 
-=======================================================================================================
+=====================================================================================
 
--- ### Check Size of all Tables ### --
+-- ### Check Size of all Schemas ### --
 
 SELECT
     schemaname,
@@ -41,4 +41,4 @@ FROM (
 ORDER BY
     total_bytes DESC;
 
-=======================================================================================================
+======================================================================================

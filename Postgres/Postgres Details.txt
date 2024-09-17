@@ -1,0 +1,181 @@
+-- ################################# PostgreSQL ######################################## --
+=======================================================================================
+-- cat ../pg_dbs_backup.sh
+-- RedHat Linux 8.9
+-- PostgreSQL 16.3
+-- sudo dnf install ( for installations )
+-- SELECT pg_reload_conf();
+-- psql -U postgres -d postgres -- SHOW config_file;
+-- /u01/pgsql/16/data/postgresql.conf
+-- sudo systemctl restart postgresql-16 ( stop / start)-- Restarts all server ( and service )
+-- pg_ctl reload ( only restart service )
+-- echo $PG_CONFIG /usr/pgsql-16/bin/pg_config
+
+=======================================================================================
+-- Check which config is being used
+-- in psql:
+SHOW config_file;
+--
+-- list directory files from pgAdmin ( on server )
+SELECT * FROM pg_ls_dir('/u01/pgsql/16/data');
+-- Read a file from pgAdmin ( on server )
+select pg_read_file('/u01/pgsql/16/data/*')
+-- Check a file's stats from pgAdmin ( on server )
+select pg_stat_file('/u01/pgsql/16/data/*')
+--
+pg_config
+pg_config --version 
+
+-- Configuration file
+postgresql.conf
+
+-- Auth file
+pg_hba.conf
+
+-- Check postgres Installation
+rpm -qa | grep postgresql
+
+-- List all modules with info
+sudo dnf module info postgresql
+
+-- List postgresql modules
+sudo dnf module list postgresql
+
+-- List all modules
+sudo dnf module list
+
+-- For extensions
+sudo dnf list installed postgresql16-devel			-- @pgdg16
+sudo dnf list installed make
+sudo dnf list installed gcc
+
+=======================================================================================
+To search for something:
+- locate
+- whereis
+- find
+- which
+
+=======================================================================================
+-- DEBUGGING -- 
+SET client_min_messages = DEBUG1;  -- DEBUG5 ( more INFO ( from 1 to 5 ) )
+-- Yes, you can set client_min_messages to DEBUG1 in a normal session in pgAdmin4
+RESET client_min_messages;
+-- RESET
+
+=======================================================================================
+# Add settings for extensions here
+shared_preload_libraries = 'pg_cron, pg_stat_statements, system_stats'
+cron.database_name = 'postgres'
+cron.nodename = ''                              #localhost
+#log_min_messages = info
+#log_directory = '/u01/pgsql/16/data/pg_log'    # Directory where logs will be stored
+#log_filename = 'pg_cron-%Y-%m-%d_%H%M%S.log'   # Log file name pattern
+
+=======================================================================================
+DISCARD ALL; -- This command resets the session to its initial state by discarding various session-specific resources
+DISCARD TEMP; -- This command removes all temporary tables created in the session
+SELECT pg_advisory_unlock_all();  -- Releases all advisory locks held by the current session
+CLOSE ALL;  -- Closes all open cursors in the current session
+
+=======================================================================================
+-- Sample FUNCTION:
+CREATE FUNCTION add_numbers(a INT, b INT) RETURNS INT AS $$
+BEGIN
+  RETURN a + b;
+END;
+$$ LANGUAGE plpgsql;
+
+=======================================================================================
+-- Sample PROCEDURE:
+CREATE PROCEDURE transfer_funds(from_account INT, to_account INT, amount DECIMAL)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  UPDATE accounts SET balance = balance - amount WHERE account_id = from_account;
+  UPDATE accounts SET balance = balance + amount WHERE account_id = to_account;
+END;
+$$;
+
+=======================================================================================
+SET plpgsql.variable_conflict = 'use_column';
+-- If a variable name conflicts with a column name in a query, the column name is used.
+-- Used in Procedures and Functions ( PL/pgSQL )
+
+=======================================================================================
+-- ANALYZE: the statement is actually executed when the ANALYZE option is used
+BEGIN;
+EXPLAIN ANALYZE ...;
+ROLLBACK;
+
+=======================================================================================
+-- Creating a directory ( for logs ) with owner and permission
+sudo mkdir -p /u01/pgsql/16/data/pg_amcheck
+sudo chown postgres:postgres /u01/pgsql/16/data/pg_amcheck
+sudo chmod 700 /u01/pgsql/16/data/pg_amcheck
+-- Check permission:
+ls -ld /u01/pgsql/16/data/pg_amcheck
+
+=======================================================================================
+-- Parallel in Postgres
+
+-- For a SESSION
+SET max_parallel_workers_per_gather = 0;
+-- For a TABLE
+ALTER TABLE your_table SET (parallel_workers = 4);
+
+=======================================================================================
+-- Increase memory per session or per query
+SET work_mem = '8MB';
+SELECT * FROM large_table ORDER BY some_column;
+
+=======================================================================================
+-- Reindex all your indexes on a table
+REINDEX TABLE your_table_name;
+
+=======================================================================================
+sudo make install   -- When this doesnt work use the path inside sudo:
+sudo PATH=$PATH:/usr/pgsql-16/bin make install
+
+=======================================================================================
+-- Restart/ Recache PgAdminWeb
+sudo systemctl restart httpd
+
+=======================================================================================
+-- Sequence Table
+select * from sdedba.ref_sys_table_sequence
+
+=======================================================================================
+-- Terminate a process ( locked table )
+SELECT pg_terminate_backend();
+--
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE pid = 12345;  -- Replace with the actual PID
+
+=======================================================================================
+-- OS check
+cat /etc/os-release
+
+=======================================================================================
+
+-- Check for listen port ( psql )
+ls -l /run/postgresql/.s.PGSQL.5432
+
+-- Check for listen port
+sudo cat /var/lib/16/main/postgresql.conf | grep -E 'port|listen_addresses'
+
+sudo systemctl list-units --type=service | grep postgresql
+
+-- Check hosts on server
+sudo vi /etc/hosts
+
+-- List owner and permission of all sub directories and files
+sudo find /var/lib/pgbackrest/backup/mydb -exec ls -ld {} \;
+
+-- Change all sub directories and files owner
+sudo chown -R postgres:postgres /var/lib/pgbackrest/mydb
+
+=======================================================================================
+
+sudo -u postgres pg_resetwal /var/lib/pgsql/16/data
