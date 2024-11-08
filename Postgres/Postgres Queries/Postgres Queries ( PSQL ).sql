@@ -131,25 +131,18 @@ FROM
 
 -- ### Check Size of Tables in every Schema ### --
 
-CREATE OR REPLACE FUNCTION analyze_disk_usage()
-RETURNS TABLE(table_name TEXT, total_size BIGINT, table_size BIGINT, index_size BIGINT, toast_size BIGINT) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        tablename::TEXT AS table_name,
-        pg_total_relation_size('"' || schemaname || '"."' || tablename || '"') AS total_size,
-        pg_relation_size('"' || schemaname || '"."' || tablename || '"') AS table_size,
-        pg_indexes_size('"' || schemaname || '"."' || tablename || '"') AS index_size,
-        pg_total_relation_size('"' || schemaname || '"."' || tablename || '"') 
-        - pg_relation_size('"' || schemaname || '"."' || tablename || '"') 
-        - pg_indexes_size('"' || schemaname || '"."' || tablename || '"') AS toast_size
-    FROM pg_tables
-    WHERE schemaname = 'sdedba';
-END;
-$$ LANGUAGE plpgsql;
-
--- Usage:
-SELECT * FROM analyze_disk_usage();
+SELECT
+    tablename::TEXT AS table_name,
+    pg_total_relation_size('"' || schemaname || '"."' || tablename || '"') / 1024 AS total_size_kb,
+    pg_relation_size('"' || schemaname || '"."' || tablename || '"') / 1024 AS table_size_kb,
+    pg_indexes_size('"' || schemaname || '"."' || tablename || '"') / 1024 AS index_size_kb,
+    (pg_total_relation_size('"' || schemaname || '"."' || tablename || '"') 
+    - pg_relation_size('"' || schemaname || '"."' || tablename || '"') 
+    - pg_indexes_size('"' || schemaname || '"."' || tablename || '"')) / 1024 AS toast_size_kb
+FROM pg_tables
+WHERE schemaname = 'findba'
+ORDER BY total_size_kb DESC
+LIMIT 100;
 
 =============================================================================================
 
@@ -176,7 +169,8 @@ ORDER BY
 -- All DB's Stats
  
 SELECT 
-    datname,
+    A.datname,
+    pg_size_pretty(pg_database_size(B.datname)) AS database_size,
     numbackends AS connections,
     xact_commit AS commits,
     xact_rollback AS rollbacks,
@@ -187,8 +181,11 @@ SELECT
     tup_inserted AS rows_inserted,
     tup_updated AS rows_updated,
     tup_deleted AS rows_deleted
-FROM pg_stat_database
-ORDER BY datname;
+FROM pg_stat_database A
+     JOIN pg_database B ON B.oid = A.datid
+ORDER BY
+    numbackends DESC;
+
 =============================================================================================
 -- ALL TABLE STATS ------------------------------------------------------------------------
 
@@ -288,16 +285,6 @@ LEFT OUTER JOIN pg_class
     ON pg_locks.relation = pg_class.oid
 ORDER BY pg_stat_activity.query_start;
 
-=============================================================================================
--- Check Tablespaces size
-
-SELECT 
-  spcname,
-  pg_size_pretty(pg_tablespace_size(spcname)) AS size
-FROM 
-  pg_tablespace
-ORDER BY 
-  pg_tablespace_size(spcname) DESC;
 =============================================================================================
 -- Get Procedures
 
@@ -405,7 +392,23 @@ ORDER BY
 LIMIT 10;
 =============================================================================================
 -- Tables requiring vacuum
-
+ 
+ SELECT 
+    relname,
+    schemaname,
+    last_vacuum,
+    last_autovacuum,
+    vacuum_count,
+    autovacuum_count,
+    n_dead_tup,
+    n_live_tup
+FROM 
+    pg_stat_all_tables
+WHERE 
+    n_dead_tup > 1000
+ORDER BY 
+    n_dead_tup DESC;
+---------------------------	
 SELECT
   schemaname,
   relname,
@@ -416,6 +419,19 @@ WHERE
   n_dead_tup > 1000
 ORDER BY
   n_dead_tup DESC;
+  
+-- Last Vacuum
+
+SELECT 
+    relname AS table_name,
+    schemaname AS schema_name,
+    last_vacuum,
+    last_autovacuum
+FROM 
+    pg_stat_all_tables
+WHERE 
+    relname = 'usm_user_multi_misc_info';
+
 =============================================================================================
 -- Tables requiring analyze
 
@@ -625,6 +641,7 @@ WHERE
 
 =============================================================================================
 -- Check for tables that are most sequence scanned
+
 SELECT 
   schemaname, 
   relname, 
@@ -636,7 +653,7 @@ FROM
 WHERE 
   seq_scan > 0 AND schemaname not in ('pg_catalog', 'information_schema') 
 ORDER BY 
-  Avg_seq_read DESC LIMIT 30;
+  seq_scan DESC LIMIT 30;
 
 =============================================================================================
 
@@ -678,5 +695,172 @@ SELECT
     buffers_alloc 
 FROM 
     pg_stat_bgwriter;
+
+=============================================================================================
+
+SELECT *
+FROM pg_stat_activity
+Where now() - query_start > interval '15 minutes';
+
+=============================================================================================
+
+-- Detecting Deadlocks ( Locks held by tables )
+WITH BLOCKED AS
+	(SELECT BLOCKED_LOCKS.PID,
+			BLOCKED_LOCKS.LOCKTYPE AS BLOCKED_LOCKTYPE,
+			RELATION::REGCLASS AS LOCKED_TABLE,
+			MODE AS BLOCKED_MODE
+		FROM PG_LOCKS BLOCKED_LOCKS
+		JOIN PG_STAT_ACTIVITY BLOCKED_ACTIVITY ON BLOCKED_LOCKS.PID = BLOCKED_ACTIVITY.PID
+		WHERE NOT BLOCKED_LOCKS.GRANTED ),
+	BLOCKING AS
+	(SELECT BLOCKING_LOCKS.PID,
+			BLOCKING_LOCKS.LOCKTYPE AS BLOCKING_LOCKTYPE,
+			RELATION::REGCLASS AS LOCKED_TABLE,
+			MODE AS BLOCKING_MODE
+		FROM PG_LOCKS BLOCKING_LOCKS
+		JOIN PG_STAT_ACTIVITY BLOCKING_ACTIVITY ON BLOCKING_LOCKS.PID = BLOCKING_ACTIVITY.PID
+		WHERE BLOCKING_LOCKS.GRANTED )
+SELECT BLOCKING.PID AS BLOCKING_PID,
+	BLOCKED.PID AS BLOCKED_PID,
+	BLOCKING.LOCKED_TABLE AS BLOCKING_TABLE,
+	BLOCKED.LOCKED_TABLE AS BLOCKED_TABLE,
+	BLOCKING.BLOCKING_MODE AS BLOCKING_MODE,
+	BLOCKED.BLOCKED_MODE AS BLOCKED_MODE,
+	PG_STAT_ACTIVITY.QUERY AS BLOCKED_QUERY
+FROM BLOCKED
+JOIN BLOCKING ON BLOCKED.LOCKED_TABLE = BLOCKING.LOCKED_TABLE
+JOIN PG_STAT_ACTIVITY ON BLOCKED.PID = PG_STAT_ACTIVITY.PID
+ORDER BY BLOCKED_QUERY;
+
+=============================================================================================
+
+-- Identifying Blocking Chains
+WITH RECURSIVE lock_tree AS (
+    SELECT
+        blocked_locks.pid AS blocked_pid,
+        blocked_activity.query AS blocked_query,
+        blocked_activity.query_start AS blocked_query_start,
+        blocked_activity.state AS blocked_state,
+        blocking_locks.pid AS blocking_pid,
+        blocking_activity.query AS blocking_query,
+        blocking_activity.query_start AS blocking_query_start,
+        blocking_activity.state AS blocking_state
+    FROM pg_locks blocked_locks
+    JOIN pg_stat_activity blocked_activity ON blocked_locks.pid = blocked_activity.pid
+    JOIN pg_locks blocking_locks ON blocked_locks.locktype = blocking_locks.locktype
+        AND blocked_locks.relation = blocking_locks.relation
+        AND blocked_locks.database = blocking_locks.database
+    JOIN pg_stat_activity blocking_activity ON blocking_locks.pid = blocking_activity.pid
+    WHERE NOT blocked_locks.granted
+        AND blocking_locks.granted
+)
+SELECT * FROM lock_tree
+ORDER BY blocked_query_start DESC;
+
+=============================================================================================
+
+-- Analyze Waiting Events ( Check for AutoVacuum )
+SELECT 
+    pid, 
+    usename, 
+    datname, 
+    state, 
+    wait_event_type, 
+    wait_event, 
+    age(clock_timestamp(), query_start) AS runtime, 
+    query
+FROM 
+    pg_stat_activity
+WHERE 
+    state <> 'idle'
+AND wait_event IS NOT NULL
+ORDER BY runtime DESC;
+
+=============================================================================================
+
+-- Cache hit ratio for queries
+SELECT 
+    calls,
+    ROUND(total_exec_time::numeric / 60000, 2) AS total_exec_time_minutes, 
+    ROUND(total_exec_time::numeric / calls / 1000, 2) AS avg_exec_time_per_call_ms,
+    rows,
+    shared_blks_read, 
+    shared_blks_hit, 
+    ROUND(100 * shared_blks_hit / NULLIF(shared_blks_hit + shared_blks_read, 0), 2) AS cache_hit_ratio,
+    temp_blks_read,
+    temp_blks_written,
+    query
+FROM 
+    pg_stat_statements
+ORDER BY 
+    total_exec_time DESC
+LIMIT 100;
+
+=============================================================================================
+
+-- Suppose you have a table called "users" with a column "username"
+SELECT username
+FROM users
+WHERE username %% 'johnny';
+
+
+SELECT * FROM my_table WHERE my_column %% 'hello';
+
+=============================================================================================
+
+-- List of Latest executed queries
+SELECT
+    state,
+    application_name,
+    client_addr AS ip_address,
+    backend_start,
+    now() - query_start AS execution_time,
+	query
+FROM
+    pg_stat_activity
+WHERE
+	query != ''
+AND
+	query NOT LIKE 'SET application_name%'
+AND 
+	query NOT LIKE 'COMMIT'
+ORDER BY
+    query_start DESC
+LIMIT 100;
+
+=============================================================================================
+
+-- pg_stat_io
+SELECT *
+FROM pg_stat_io
+--
+SELECT backend_type, 
+       context, 
+       reads, 
+       writes, 
+       hits, 
+       evictions
+FROM pg_stat_io
+ORDER BY backend_type;
+
+=============================================================================================
+
+-- All functions
+
+SELECT 
+    n.nspname AS schema_name, 
+    p.proname AS function_name, 
+    pg_catalog.pg_get_function_result(p.oid) AS result_type, 
+    pg_catalog.pg_get_function_arguments(p.oid) AS arguments 
+FROM 
+    pg_catalog.pg_proc p 
+JOIN 
+    pg_catalog.pg_namespace n ON n.oid = p.pronamespace 
+WHERE 
+    n.nspname NOT IN ('pg_catalog', 'information_schema')
+-- AND p.proname LIKE 'run_python_cmd'
+ORDER BY 
+    schema_name, function_name;
 
 =============================================================================================

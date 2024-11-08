@@ -275,3 +275,10 @@ SELECT *
         AND privilege_type = 'EXECUTE'
 
 ==============================================================================
+-- Default Tablespace + Alter
+SELECT datname, pg_tablespace.spcname 
+FROM pg_database 
+JOIN pg_tablespace ON pg_database.dattablespace = pg_tablespace.oid
+WHERE datname = 'mydatabase';
+--
+ALTER DATABASE mydatabase SET TABLESPACE mytablespace;

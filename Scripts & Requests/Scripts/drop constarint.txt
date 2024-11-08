@@ -1,1 +1,0 @@
-alter table "SDEDBA"."REF_CUST_DOC_TYPE_RULE_DTL" drop constraint "FK_CUSTOMER_STT";

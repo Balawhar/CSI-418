@@ -17,8 +17,17 @@ To Install:
 -- Barman				 -- Backups
 -- Nagios				 -- Monitoring +
 -- Citus
-
+ 
 **
+
+-- pg_partman 
+-- pg_repack 
+-- pg_dbms_lock_16
+-- pg_bulkload_16
+-- pg_bloat_check
+-- pg_back.noarch 
+-- jsquery_16
+
 
 -- ltree				 -- The ltree data type is used to represent hierarchical structure.
 -- pgAudit	      1.7.0	 -- Generate highly compliant audit logs.
@@ -27,8 +36,6 @@ To Install:
 -- pg-safeupdate	1.4	 -- Protect your data from accidental updates or deletes.
 -- wal2json	    commit	 -- JSON output plugin for logical replication decoding.
 -- pg_stat_monitor 1.0.1 -- Query Performance Monitoring Tool for PostgreSQL
--- pg_partman
--- pg_repack
 -- Sqitch
 -- file_fdw
 -- pgcrypto
@@ -56,137 +63,279 @@ citext
 pg_trgm
 dblink
 tablefunc
+pljava
+plpython3u
+plsh
+
 pgBadger -- 79
 system_stats -- 79
 pgbench -- 79
 amcheck -- 79
+pg_stat_kcache -- 79
+
+=======================================================================================
+-- ADD to postgresql.conf
+
+#------------------------------------------------------------------------------
+# CUSTOMIZED OPTIONS
+#------------------------------------------------------------------------------
+
+# Add settings for extensions here
+
+#pg_stat_statements
+
+#shared_library_path = '/usr/lib/postgresql/17/lib'
+shared_preload_libraries = 'pg_stat_statements, pljava'
+
+#pg_cron settings
+#cron.database_name = 'postgres'
+
+#pljava settings
+#Path to the JVM shared library
+#pljava.libjvm_location = '/usr/lib/jvm/java-1.11.0-openjdk-amd64/lib/server/libjvm.so'
+
+pljava.libjvm_location = '/usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so'
+
+# Set the Java home directory
+#pljava.java_home = '/usr/lib/jvm/java-1.11.0-openjdk-amd64'
+
+# Set the default memory settings for PL/Java
+#pljava.vm_options = '-Xmx512m'
+#pljava.vm_options = '-Xmx512m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005'
+#pljava.classpath = '/usr/share/postgresql/17/pljava/pljava-1.6.8.jar'
 
 =======================================================================================
 
-******* -- pg_cron  - Installed not configured 
+SELECT * FROM pg_available_extensions WHERE name = 'pg_stat_statements';
 
--- pg_cron
+select * from pg_available_extension_versions where name = 'pg_stat_statements';
 
--- Edit postgresql.conf to include:
+-- Search
+find / -name "logfile" 2>/dev/null
 
-cron.database_name = 'postgres'
-shared_preload_libraries = 'pg_cron, pg_stat_statements'
+-- .control / .sql files
+/usr/share/postgresql/17/extension
+
+-- .so files
+/usr/lib/postgresql/17/lib/
+
+=======================================================================================
+
+-- pg_stat_statements
+
+sudo find / -name "pg_stat_statements.so"
+
+ls -l /usr/lib/postgresql/17/lib/pg_stat_statements.so
+
+-- sudo chown postgres:postgres /usr/lib/postgresql/17/lib/pg_stat_statements.so
+
+-- sudo chmod 644 /usr/lib/postgresql/17/lib/pg_stat_statements.so
+
+shared_preload_libraries = 'pg_stat_statements'
+
+-- pg_stat_statements.max = 10000
+-- pg_stat_statements.track = all
+
+sudo systemctl restart postgres
+
+Create Extension pg_stat_statements;
+
+=======================================================================================
+
+-- PL/Python3u
+
+sudo apt update
+sudo apt install postgresql-plpython3-17
+
+sudo apt install --reinstall python3-apt
+
+-- wget http://archive.ubuntu.com/ubuntu/pool/main/a/apt/apt_2.4.7ubuntu1_amd64.deb
+
+sudo apt update --allow-releaseinfo-change
+sudo apt install --reinstall python3-apt
+
+apt-cache policy python3-apt
+
+python3 -m site
+
+ls /usr/lib/python3/dist-packages/
+
+sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+
+sudo update-alternatives --config python3
+-- choose this: * 2            /usr/bin/python3.12   1         manual mode
+
+python3 --version
+-- you should see this : Python 3.12.x
+
+sudo apt install postgresql-plpython3-17
+
+CREATE EXTENSION plpython3u;
+
+CREATE OR REPLACE FUNCTION test_python()
+RETURNS text AS $$
+    return 'Hello from PL/Python!'
+$$ LANGUAGE plpython3u;
+
+SELECT test_python();
+
+=======================================================================================
+
+-- PLsh
+
+sudo apt update
+sudo apt install postgresql-server-dev-17 build-essential
+
+sudo apt install git
+
+git clone https://github.com/petere/plsh.git
+cd plsh
+
+make
+sudo make install
+
+CREATE EXTENSION plsh;
+
+SELECT lanname FROM pg_language;
+
+=======================================================================================
+
+-- PL/java
+	
+sudo apt update
+sudo apt install openjdk-11-jdk
+sudo apt install postgresql-17-pljava
+
+java -version
+javac -version
+
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+echo $JAVA_HOME
+
+echo 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64' >> ~/.bashrc
+source ~/.bashrc
+
+pljava.libjvm_location = '${JAVA_HOME}/lib/server/libjvm.so'
+
+echo $JAVA_HOME
+-- /usr/lib/jvm/java-11-openjdk-amd64
+
+ls ${JAVA_HOME}/lib/server/libjvm.so
+
+-- add to conf
+pljava.libjvm_location = '${JAVA_HOME}/lib/server/libjvm.so'
+
+-- sudo find /usr/lib/postgresql/17/lib -name "pljava*.so"
+-- ls -l /usr/lib/postgresql/17/lib/ | grep pljava
+-- sudo find / -name "pljava*.so"
+-- sudo chown postgres:postgres /usr/lib/postgresql/17/lib/libpljava-so-1.6.8.so
+
+sudo find / -name "pljava*.jar"
+dpkg -L postgresql-17-pljava | grep jar
+
+* -- Add to config
+#pljava settings
+#Path to the JVM shared library
+#pljava.libjvm_location = '/usr/lib/jvm/java-1.11.0-openjdk-amd64/lib/server/libjvm.so'
+
+pljava.libjvm_location = '/usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so'
+
+# Set the Java home directory
+#pljava.java_home = '/usr/lib/jvm/java-1.11.0-openjdk-amd64'
+
+# Set the default memory settings for PL/Java
+#pljava.vm_options = '-Xmx512m'
+#pljava.vm_options = '-Xmx512m -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005'
+#pljava.classpath = '/usr/share/postgresql/17/pljava/pljava-1.6.8.jar'
+*
+
+ls -l /usr/lib/jvm/java-1.11.0-openjdk-amd64/lib/server/libjvm.so
+ls -l /usr/lib/jvm/java-1.11.0-openjdk-amd64
+
+sudo chmod 755 /usr/lib/jvm/java-1.11.0-openjdk-amd64/lib/server/libjvm.so
+
+sudo chown postgres:postgres /usr/lib/jvm/java-1.11.0-openjdk-amd64/lib/server/libjvm.so
+
+sudo chown -R postgres:postgres /usr/lib/jvm/java-1.11.0-openjdk-amd64
+
+ls -l /usr/lib/jvm/java-1.11.0-openjdk-amd64/lib/server/libjvm.so
+ls -l /usr/lib/jvm/java-1.11.0-openjdk-amd64
+
+shared_preload_libraries = 'pljava'
 
 sudo systemctl restart postgresql
 
+SELECT * FROM pg_available_extensions WHERE name = 'pljava';
 
-******* 
+SHOW pljava.libjvm_location;
 
-******* 
--- Create it on database level 
+-- SELECT pg_reload_conf();
+
+-- SELECT pljava.load_java();
+
+CREATE EXTENSION pljava;
+
+=======================================================================================
+
+-- psycopg2
+
+sudo apt update
+sudo apt install libpq-dev python3-dev
+pip install psycopg2
+
+python3 -m venv vpostgres
+
+source vpostgres/bin/activate
+
+pip install psycopg2
+
+python -c "import psycopg2; print(psycopg2.__version__)"
+
+vpostgres deactivate
+
+vpostgres activate
+
+=======================================================================================
+
+-- pg_cron
+
+sudo apt install wget gnupg2
+
+-- wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+sudo wget -qO /usr/share/keyrings/pgdg.gpg https://www.postgresql.org/media/keys/ACCC4CF8.asc
+
+echo "deb [signed-by=/usr/share/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+
+sudo apt update
+
+sudo rm /usr/share/keyrings/pgdg.gpg
+
+wget -qO - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor | sudo tee /usr/share/keyrings/pgdg.gpg > /dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/pgdg.gpg] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+
+sudo apt install postgresql-17-cron
+
+shared_preload_libraries = 'pg_cron'
+cron.database_name = 'vfds_dev'
+
+-- ls -l /usr/lib/postgresql/17/lib/ | grep pg_cron
+-- sudo find /usr/lib/postgresql/17/lib -name "pg_cron.so"
+
+-- /usr/lib/postgresql/17/lib/pg_cron.so
+
+-- sudo chown postgres:postgres /usr/lib/postgresql/17/lib/pg_cron.so
+-- ls -ld /usr/lib/postgresql/17/lib/pg_cron.so
+
+
+sudo systemctl restart postgresql
 
 CREATE EXTENSION pg_cron;
-
-GRANT USAGE ON SCHEMA cron TO pgdba;
-
-SELECT * FROM cron.job;
-
-SELECT * FROM cron.job_run_details ORDER BY end_time DESC LIMIT 5;
-
-
-
-CREATE USER pgcron WITH PASSWORD 'Pgcron@Valoores';
-
-
-
-GRANT CONNECT ON DATABASE postgres TO pgcron;
--- Grant additional privileges as needed
-
-
-
-# Allow local connections with password authentication
-host    all             pgcron       127.0.0.1/32            md5
-
-
-hostname:port:database:username:password
-
-
-localhost:5432:postgres:pgcron:Pgcron@Valoores
-
-
-chmod 600 /u01/pgsql/16/data/.pgpass
-
-
-sudo systemctl restart postgresql-16
-
-
-ls -ld /u01/pgsql/16/data/.pgpass
-
-
-
-GRANT CONNECT ON DATABASE postgres TO pgcron;
-GRANT USAGE ON SCHEMA public TO pgcron;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO pgcron;
-
-
-GRANT USAGE ON SCHEMA cron TO pgcron;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA cron TO pgcron;
-
-
-
-change location of :
-ls -l ~/.pgpass
-
-
-
-
-mv /u01/pgsql/16/data/.pgpass /u01/pgsql/.pgpass
-
-
-ls -ld /u01/pgsql/.pgpass
-
-chmod 600 /u01/pgsql/.pgpass
-
-
-export PGPASSFILE=/u01/pgsql/.pgpass
-
-
-sudo systemctl restart postgresql-16
-
-
-psql -h localhost -U pgcron -d postgres
-
-
-unset PGPASSFILE
-
-
-
-******* 
-
-*******
--- Second db
-psql -U your_username -d db2
-CREATE EXTENSION pg_cron;
-
--- Install dblink extension in vcisdb and db2 (if not already installed):
-CREATE EXTENSION dblink;
-
-SELECT dblink_connect('vcisdb_conn', 'host=mtbdb dbname=vcisdb user=pgdba password=Pgdba@2024');
-
-CREATE OR REPLACE FUNCTION vcisdb_remote_job(sql_command text)
-RETURNS void AS $$
-BEGIN
-    PERFORM dblink_exec('vcisdb_conn', sql_command);
-END;
-$$ LANGUAGE plpgsql;
-
-SELECT cron.schedule(
-    '*/5 * * * *',  -- Schedule (every 5 minutes in this example)
-    $$SELECT run_job_on_second_db('INSERT INTO my_table VALUES (1, ''example'');')$$
-);
-
-SELECT dblink_disconnect('second_db_conn');
-*******
 
 =======================================================================================
 
 ******* -- postgres-fdw
-
 
 select * from ssdx_eng.item_store_difusion_boh;
 
@@ -261,14 +410,9 @@ CREATE EXTENSION fuzzystrmatch;
 
 SELECT custom_functions.soundex('hello');
 
-
-
-******* 
-
 =======================================================================================
 
 ******* -- citext
-
 
 CREATE EXTENSION citext;
 
@@ -288,16 +432,12 @@ INSERT INTO example_table (name) VALUES
 
 SELECT * FROM example_table WHERE name = 'alice';
 
-
-******* 
-
 =======================================================================================
 
 ******* -- dblink
 
 
 CREATE EXTENSION dblink;
-
 
 
 SELECT dblink_connect('conn1', 'host=10.10.10.70 user=postgres password=Postgres@2024 dbname=V21');
@@ -307,32 +447,144 @@ SELECT * FROM dblink('conn1', 'SELECT city_id, city_name FROM sdedba.ref_com_cit
 SELECT dblink_disconnect('conn1');
 
 
-
 select * from sdedba.ref_com_city;
 
 city_id
 city_name
 
-
-
-*******
-
 =======================================================================================
 
 ******* -- tablefunc
 
-
 CREATE EXTENSION tablefunc;
 
-
-*******
-
 =======================================================================================
-PostGIS
+
+-- PostGIS
 
 CREATE EXTENSION postgis;
 CREATE EXTENSION postgis_topology
  -- CREATE EXTENSION postgis_raster ( Not installed )
+
+=======================================================================================
+
+
+******* -- pg_cron  - Installed not configured 
+
+-- pg_cron
+
+-- Edit postgresql.conf to include:
+
+shared_preload_libraries = 'pg_cron, pg_stat_statements'
+cron.database_name = 'postgres'
+
+sudo systemctl restart postgresql
+
+
+******* 
+
+******* 
+-- Create it on database level 
+
+CREATE EXTENSION pg_cron;
+
+GRANT USAGE ON SCHEMA cron TO pgdba;
+
+SELECT * FROM cron.job;
+
+SELECT * FROM cron.job_run_details ORDER BY end_time DESC LIMIT 5;
+
+
+
+CREATE USER pgcron WITH PASSWORD 'Pgcron';
+
+
+
+GRANT CONNECT ON DATABASE postgres TO pgcron;
+-- Grant additional privileges as needed
+
+
+
+# Allow local connections with password authentication
+host    all             pgcron       127.0.0.1/32            md5
+
+
+hostname:port:database:username:password
+
+
+localhost:5432:postgres:pgcron:Pgcron@Valoores
+
+
+chmod 600 /u01/pgsql/16/data/.pgpass
+
+
+sudo systemctl restart postgresql-16
+
+
+ls -ld /u01/pgsql/16/data/.pgpass
+
+
+
+GRANT CONNECT ON DATABASE postgres TO pgcron;
+GRANT USAGE ON SCHEMA public TO pgcron;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO pgcron;
+
+
+GRANT USAGE ON SCHEMA cron TO pgcron;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA cron TO pgcron;
+
+
+
+change location of :
+ls -l ~/.pgpass
+
+
+
+mv /u01/pgsql/16/data/.pgpass /u01/pgsql/.pgpass
+
+
+ls -ld /u01/pgsql/.pgpass
+
+chmod 600 /u01/pgsql/.pgpass
+
+
+export PGPASSFILE=/u01/pgsql/.pgpass
+
+
+sudo systemctl restart postgresql-16
+
+
+psql -h localhost -U pgcron -d postgres
+
+
+unset PGPASSFILE
+
+******* 
+
+*******
+-- Second db
+psql -U your_username -d db2
+CREATE EXTENSION pg_cron;
+
+-- Install dblink extension in vcisdb and db2 (if not already installed):
+CREATE EXTENSION dblink;
+
+SELECT dblink_connect('vcisdb_conn', 'host=mtbdb dbname=vcisdb user=pgdba password=Pgdba@2024');
+
+CREATE OR REPLACE FUNCTION vcisdb_remote_job(sql_command text)
+RETURNS void AS $$
+BEGIN
+    PERFORM dblink_exec('vcisdb_conn', sql_command);
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT cron.schedule(
+    '*/5 * * * *',  -- Schedule (every 5 minutes in this example)
+    $$SELECT run_job_on_second_db('INSERT INTO my_table VALUES (1, ''example'');')$$
+);
+
+SELECT dblink_disconnect('second_db_conn');
+*******
 
 =======================================================================================
 
@@ -371,11 +623,9 @@ Restart=always
 [Install]
 WantedBy=multi-user.target
 
-
 sudo systemctl daemon-reload
 
 *** -- Optional 
-
 
 sudo systemctl enable pgagent
 sudo systemctl start pgagent
@@ -490,6 +740,7 @@ chmod +x /path/to/pgbadger_daily.sh
 
 
 =======================================================================================
+
 ******* -- system_stats on 79
 
 module_pathname = '/u01/pgsql/system_stats-3.0/system_stats.so'
@@ -537,6 +788,7 @@ sudo systemctl restart postgresql-16
 CREATE EXTENSION system_stats;
 *
 =======================================================================================
+
 ******* amcheck -- on 79 -- Postgres
 
 CREATE EXTENSION amcheck;
@@ -951,13 +1203,9 @@ SELECT * FROM pgagent.pga_joblog WHERE jlgjobid = 1;
 
 ******************************************************************************************
 
-
-
-
+-- pgbackrest
 
 sudo dnf install pgbackrest
-
-
 
 
 [global]
@@ -1330,3 +1578,27 @@ sudo -u postgres pgbackrest --stanza=mydb --pg1-path=/u01/pgsql/16/data restore
 
 ******************************************************************************************
  
+-- pg_stat_kcache
+
+
+select * from pg_stat_kcache
+
+select * from pg_stat_kcache()
+
+select * from pg_stat_kcache_detail
+
+SELECT pg_stat_kcache_reset();
+
+
+
+******************************************************************************************
+
+-- pgbench
+
+pgbench -i testdb
+
+pgbench -c 10 -j 2 -T 60 testdb > pgbench_results.log 2>&1
+
+pgbench -c 10 -j 2 -T 60 testdb > pgbench_testdb_$(date +%Y%m%d_%H%M%S).log 2>&1
+
+******************************************************************************************

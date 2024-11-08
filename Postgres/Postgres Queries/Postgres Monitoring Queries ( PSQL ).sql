@@ -196,13 +196,14 @@ SELECT
 
 SELECT 
     calls, 
-    total_exec_time, 
+--     ROUND(total_exec_time::numeric / 60000, 1) AS total_exec_time_minutes, 
+    ROUND(total_exec_time::numeric / calls / 1000, 2) AS avg_exec_time_per_call_sec, 
     rows, 
     shared_blks_read, 
     shared_blks_hit,
     temp_blks_read,
     temp_blks_written,
-	query
+    query
 FROM 
     pg_stat_statements
 ORDER BY 
@@ -233,6 +234,7 @@ ORDER BY
 LIMIT 20;
 
 =============================================================================================
+
 
 
 

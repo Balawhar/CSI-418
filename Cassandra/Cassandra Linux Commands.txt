@@ -59,6 +59,16 @@ SELECT table_name FROM system_schema.tables WHERE keyspace_name = 'datacrowd';  
 --- CPU --- Processes --- Threads --- Monitoring ---
 sar                      				-- Collect, report, and save system activity information
 sar -u 1   								-- Display CPU utilization every 1 second
+
+-- Memory
+cat /proc/meminfo
+vmstat -s
+journalctl -k | grep -i "oom"
+grep -i "oom" /var/log/syslog
+grep -i "oom" /var/log/messages
+dmesg | grep -i "memory"
+dmesg | grep -i "oom"
+
 ============================================================================================================
 ps -ef | grep java / cassandra			-- Used to kill cassandra to restart it ( first PID of cassandra is used ( Kill -9 <PID> ))
 ps -ef | grep <PID> / pmon				-- Grep Proccess monitoring

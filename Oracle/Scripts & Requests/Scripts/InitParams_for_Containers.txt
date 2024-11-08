@@ -1,0 +1,54 @@
+export ORACLE_SID=dbc12c
+sqlplus / as sysdba
+
+--------------------------------------------
+--done once no need to do it again.....(we do it once on the level of Container)
+--alter system set audit_trail=none scope=spfile;
+--alter system set db_files=5000 scope=spfile;
+--alter system set open_cursors=1500 scope=spfile;
+--alter system set processes=1500 scope=spfile;
+--alter system set sga_target=12000M scope=spfile;
+--alter system set pga_aggregate_target=10000M scope=spfile;
+--refresh sys/system (by Container)
+--@dbc12c_refresh_sys.sql
+---------------------------------------------
+
+-- start from here for next db...
+
+-- before import
+
+show pdbs
+alter session set container = internal;
+
+shut immediate
+startup upgrade
+
+alter system set MAX_STRING_SIZE='EXTENDED' SCOPE=BOTH;
+@?/rdbms/admin/utl32k.sql
+
+shut immediate
+startup
+show parameter max_string
+
+--alter session set container = internal;
+-- create tbs / <dbanme?
+-- @internal_create_tbs.sql
+
+CREATE OR REPLACE DIRECTORY "DBPUMP" as '/u01/Backup';
+GRANT read,write on DIRECTORY "DBPUMP" to public;
+
+exit
+
+------------------------------------------------------
+-- Import from OS
+nohup impdp system/system12_DB_dbc12c@suitedb \
+directory=DBPUMP full=y table_exists_action=replace \
+dumpfile=128_suitedb_SM_13022024_213001_%U.dmp \
+logfile=imp_suitedb.log >log_suitedb 2>&1 & tail -f log_suitedb
+
+-- after import
+------------------------------------------------------
+
+-- SQL
+-- refresh users
+spool internal_refresh_users.sql;

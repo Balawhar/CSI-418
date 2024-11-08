@@ -1,120 +1,13 @@
 -- ################################# PostgreSQL ######################################## --
-=======================================================================================
--- cat ../pg_dbs_backup.sh
--- RedHat Linux 8.9
--- PostgreSQL 16.3
--- sudo dnf install ( for installations )
--- SELECT pg_reload_conf();
--- psql -U postgres -d postgres -- SHOW config_file;
--- /u01/pgsql/16/data/postgresql.conf
--- sudo systemctl restart postgresql-16 ( stop / start)-- Restarts all server ( and service )
--- pg_ctl reload ( only restart service )
--- echo $PG_CONFIG /usr/pgsql-16/bin/pg_config
 
 =======================================================================================
--- Check which config is being used
--- in psql:
-SHOW config_file;
---
--- list directory files from pgAdmin ( on server )
-SELECT * FROM pg_ls_dir('/u01/pgsql/16/data');
--- Read a file from pgAdmin ( on server )
-select pg_read_file('/u01/pgsql/16/data/*')
--- Check a file's stats from pgAdmin ( on server )
-select pg_stat_file('/u01/pgsql/16/data/*')
---
-pg_config
-pg_config --version 
 
--- Configuration file
-postgresql.conf
 
--- Auth file
-pg_hba.conf
-
--- Check postgres Installation
-rpm -qa | grep postgresql
-
--- List all modules with info
-sudo dnf module info postgresql
-
--- List postgresql modules
-sudo dnf module list postgresql
-
--- List all modules
-sudo dnf module list
-
--- For extensions
-sudo dnf list installed postgresql16-devel			-- @pgdg16
-sudo dnf list installed make
-sudo dnf list installed gcc
-
-=======================================================================================
-To search for something:
-- locate
-- whereis
-- find
-- which
-
-=======================================================================================
--- DEBUGGING -- 
-SET client_min_messages = DEBUG1;  -- DEBUG5 ( more INFO ( from 1 to 5 ) )
--- Yes, you can set client_min_messages to DEBUG1 in a normal session in pgAdmin4
-RESET client_min_messages;
--- RESET
-
-=======================================================================================
-# Add settings for extensions here
-shared_preload_libraries = 'pg_cron, pg_stat_statements, system_stats'
-cron.database_name = 'postgres'
-cron.nodename = ''                              #localhost
-#log_min_messages = info
-#log_directory = '/u01/pgsql/16/data/pg_log'    # Directory where logs will be stored
-#log_filename = 'pg_cron-%Y-%m-%d_%H%M%S.log'   # Log file name pattern
-
-=======================================================================================
-DISCARD ALL; -- This command resets the session to its initial state by discarding various session-specific resources
-DISCARD TEMP; -- This command removes all temporary tables created in the session
-SELECT pg_advisory_unlock_all();  -- Releases all advisory locks held by the current session
-CLOSE ALL;  -- Closes all open cursors in the current session
-
-=======================================================================================
--- Sample FUNCTION:
-CREATE FUNCTION add_numbers(a INT, b INT) RETURNS INT AS $$
-BEGIN
-  RETURN a + b;
-END;
-$$ LANGUAGE plpgsql;
-
-=======================================================================================
--- Sample PROCEDURE:
-CREATE PROCEDURE transfer_funds(from_account INT, to_account INT, amount DECIMAL)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-  UPDATE accounts SET balance = balance - amount WHERE account_id = from_account;
-  UPDATE accounts SET balance = balance + amount WHERE account_id = to_account;
-END;
-$$;
 
 =======================================================================================
 SET plpgsql.variable_conflict = 'use_column';
 -- If a variable name conflicts with a column name in a query, the column name is used.
 -- Used in Procedures and Functions ( PL/pgSQL )
-
-=======================================================================================
--- ANALYZE: the statement is actually executed when the ANALYZE option is used
-BEGIN;
-EXPLAIN ANALYZE ...;
-ROLLBACK;
-
-=======================================================================================
--- Creating a directory ( for logs ) with owner and permission
-sudo mkdir -p /u01/pgsql/16/data/pg_amcheck
-sudo chown postgres:postgres /u01/pgsql/16/data/pg_amcheck
-sudo chmod 700 /u01/pgsql/16/data/pg_amcheck
--- Check permission:
-ls -ld /u01/pgsql/16/data/pg_amcheck
 
 =======================================================================================
 -- Parallel in Postgres
@@ -134,30 +27,22 @@ SELECT * FROM large_table ORDER BY some_column;
 REINDEX TABLE your_table_name;
 
 =======================================================================================
-sudo make install   -- When this doesnt work use the path inside sudo:
+
+export PATH=/usr/lib/postgresql/17/bin:$PATH
+make && sudo PATH=$PATH make install
+--
+sudo make install
 sudo PATH=$PATH:/usr/pgsql-16/bin make install
 
+-- when sudo make install doesnt work
+sudo PG_CONFIG=/usr/pgsql-17/bin/pg_config make install
 =======================================================================================
 -- Restart/ Recache PgAdminWeb
 sudo systemctl restart httpd
 
 =======================================================================================
--- Sequence Table
-select * from sdedba.ref_sys_table_sequence
-
-=======================================================================================
--- Terminate a process ( locked table )
-SELECT pg_terminate_backend();
---
-SELECT pg_terminate_backend(pid)
-FROM pg_stat_activity
-WHERE pid = 12345;  -- Replace with the actual PID
-
-=======================================================================================
 -- OS check
 cat /etc/os-release
-
-=======================================================================================
 
 -- Check for listen port ( psql )
 ls -l /run/postgresql/.s.PGSQL.5432
@@ -178,4 +63,108 @@ sudo chown -R postgres:postgres /var/lib/pgbackrest/mydb
 
 =======================================================================================
 
-sudo -u postgres pg_resetwal /var/lib/pgsql/16/data
+-- Application ( Start )
+
+sudo systemctl cat anthony.service
+
+WorkingDirectory=/u01/V21-VCIS
+
+sudo mkdir -p /u01/V21-VCIS
+
+sudo chown -R postgres:postgres /u01/V21-VCIS
+-- sudo chmod 755 /usr/local/bin/anthony
+
+sudo systemctl daemon-reload
+sudo systemctl restart anthony.service
+sudo systemctl status anthony.service
+--
+java -jar /u01/V21-VBS/backend//v21-dsp-1.0.0.jar
+
+tail -f /u01/V21-VBS/backend/v21-dsp-1.0.0.jar.log
+
+tail -f /u01/V21-VBS/backend/v21-dsp-1.0.0.log
+
+v21-dsp-1.0.0.jar.log
+v21-dsp-1.0.0.log
+
+=======================================================================================
+
+-- Start Postgres Server with pg_ctl
+pg_ctl restart -D /u01/pgsql/16/data -l /u01/pgsql/16/data/log/postgresql-Start-log
+
+pg_ctl status -D /u01/pgsql/16/data
+
+pkill -u postgres
+
+sudo systemctl daemon-reload
+
+sudo systemctl status postgresql-16.service
+
+=======================================================================================
+-- scp
+scp bkp_mtbdb_10.10.10.70_20092024_205502.tar.gz postgres@10.10.10.79:/u01/pgsql/backups
+=======================================================================================
+
+
+-- Search ( Most Effecient )
+find / -name "logfile" 2>/dev/null
+
+-- add the ' ... ' to the .bashrc or .bash_profile ( ~/.bash_profile )
+echo 'source /home/postgres/.rvm/scripts/rvm' >> ~/.bashrc
+
+-- pgsql
+\x
+\pset format aligned
+\pset format unaligned
+
+=======================================================================================
+
+-- Hashing a PASSWORD by SCRAM-SHA-256
+SELECT rolname, rolpassword FROM pg_authid WHERE rolname = 'pguser';
+
+SELECT usename, passwd FROM pg_shadow; 
+
+-- Su
+-- Switches to the pgbouncer user and gives you a new shell with their environment.
+sudo su - pgbouncer
+-- Runs a specified command as the pgbouncer user without switching your shell or environment.
+sudo -u pgbouncer
+--
+
+-- SELINUX log
+tail -f /var/log/audit/audit.log
+
+--
+dmesg
+
+sudo dmesg | tail -n 50
+--
+=======================================================================================
+
+SELECT pg_advisory_lock(12345);  -- Lock the file with ID 12345
+SELECT pg_advisory_unlock(12345);  -- Release the lock for the file
+
+=======================================================================================
+
+-- Settings
+select * from pg_settings
+where name = 'idle_in_transaction_session_timeout'
+
+SHOW shared_buffers;
+SHOW work_mem;
+SHOW effective_cache_size;
+SHOW maintenance_work_mem;
+SHOW max_parallel_workers_per_gather;
+SHOW random_page_cost;
+SHOW default_statistics_target;
+SHOW checkpoint_timeout;
+SHOW max_wal_size;
+SHOW effective_io_concurrency;
+
+=======================================================================================
+
+CURRENT_TIMESTAMP	-- Date & Time
+now()				-- Date & Time
+CURRENT_DATE		-- Date ONLY
+
+=======================================================================================

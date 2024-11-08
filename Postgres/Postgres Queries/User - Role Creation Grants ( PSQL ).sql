@@ -602,6 +602,8 @@ BEGIN
 END $$;
 
 ------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------
 -- Change TABLESPACE of TABLES and INDEXES ( Script ) ------------------------------------
 
 -- Define the target tablespaces
@@ -641,6 +643,14 @@ BEGIN
                         rec.schemaname, rec.indexname, index_tablespace);
     END LOOP;
 END $$;
+
+-- Default Tablespace + Alter
+SELECT datname, pg_tablespace.spcname 
+FROM pg_database 
+JOIN pg_tablespace ON pg_database.dattablespace = pg_tablespace.oid
+WHERE datname = 'mydatabase';
+--
+ALTER DATABASE mydatabase SET TABLESPACE mytablespace;
 
 =======================================================================================
 

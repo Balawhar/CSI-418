@@ -1,0 +1,17 @@
+# PostgreSQL Vaccum of all Databases on host 70 - every Sunday
+00 22 * * 7     /u01/pgscripts/pg_dbs_vaccum.sh 10.10.10.70                     >/u01/pgscripts/pg_dbs_vaccum_70_all.log                2>&1
+
+# PostgreSQL Backup of Database(s) on host 70
+#00 22 * * 1-6  /u01/pgscripts/pg_dbs_backup.sh 10.10.10.70 myvip               >/u01/pgscripts/pg_dbs_backup_70_myvip.log              2>&1
+#05 22 * * 1-6  /u01/pgscripts/pg_dbs_backup.sh 10.10.10.70 vcisdb              >/u01/pgscripts/pg_dbs_backup_70_vcisdb.log             2>&1
+#10 22 * * 1-6  /u01/pgscripts/pg_dbs_backup.sh 10.10.10.70 mtbdb               >/u01/pgscripts/pg_dbs_backup_70_mtbdb.log              2>&1
+#15 22 * * 1-6  /u01/pgscripts/pg_dbs_backup.sh 10.10.10.70 multi_media         >/u01/pgscripts/pg_dbs_backup_70_multi_media.log        2>&1
+
+# Valoores Digital Financial Services
+#20 22 * * 1-6  /u01/pgscripts/pg_dbs_backup.sh 10.10.10.70 vdpsdb              >/u01/pgscripts/pg_dbs_backup_70_vdpsdb.log             2>&1
+
+#25 22 * * 1-6  /u01/pgscripts/pg_dbs_backup.sh 10.10.10.70 vdfsdb              >/u01/pgscripts/pg_dbs_backup_70_vdfsdb.log             2>&1
+#30 22 * * 1-6  /u01/pgscripts/pg_dbs_backup.sh 10.10.10.70 vdfsdev             >/u01/pgscripts/pg_dbs_backup_70_vdfsdev.log            2>&1
+#35 22 * * 1-6  /u01/pgscripts/pg_dbs_backup.sh 10.10.10.70 vdfstst             >/u01/pgscripts/pg_dbs_backup_70_vdfstst.log            2>&1
+
+

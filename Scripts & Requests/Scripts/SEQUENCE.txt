@@ -1,7 +1,0 @@
---------------------------------------------------------
---  DDL for Sequence S_COLUMN_GROUP_ACTIVITY
---------------------------------------------------------
-
-   CREATE SEQUENCE  "SUITEDBA"."S_COLUMN_GROUP_ACTIVITY"  MINVALUE 0 MAXVALUE 9999999999 INCREMENT BY 1 
-   START WITH 128 CACHE 20 ORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL ;
-   GRANT SELECT ON "SUITEDBA"."S_COLUMN_GROUP_ACTIVITY" TO PUBLIC;

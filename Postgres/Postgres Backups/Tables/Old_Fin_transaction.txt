@@ -1,0 +1,380 @@
+-- Table: findba.fin_transaction
+
+-- DROP TABLE IF EXISTS findba.fin_transaction;
+
+CREATE TABLE IF NOT EXISTS findba.fin_transaction
+(
+    transaction_id numeric(10,0) NOT NULL DEFAULT nextval('findba.s_fin_transaction'::regclass),
+    ven_id numeric(10,0),
+    transaction_desc character varying(4000) COLLATE pg_catalog."default" NOT NULL,
+    itm_id numeric(10,0) NOT NULL,
+    transaction_internal_code character varying(100) COLLATE pg_catalog."default",
+    bsn_group_id numeric(10,0),
+    status_code numeric(10,0),
+    status_bdate date,
+    transaction_date date,
+    transaction_amnt numeric,
+    cur_cnv_future_id numeric(10,0),
+    src_customer_id numeric(10,0),
+    dst_customer_id numeric(10,0),
+    comments character varying(4000) COLLATE pg_catalog."default",
+    creation_date timestamp with time zone NOT NULL DEFAULT now(),
+    created_by numeric(10,0) NOT NULL,
+    update_date date,
+    updated_by numeric(10,0),
+    security_question character varying(4000) COLLATE pg_catalog."default",
+    security_answer character varying(4000) COLLATE pg_catalog."default",
+    tax_value numeric,
+    tax_value_type numeric(5,0),
+    transaction_purpose_code numeric(5,0) DEFAULT 0,
+    is_customer_notified character varying(1) COLLATE pg_catalog."default" NOT NULL DEFAULT '0'::character varying,
+    dst_transaction_purpose_code numeric(5,0),
+    dst_bsn_group_id numeric(10,0),
+    last_extraction_date date,
+    cur_id numeric(10,0),
+    external_soc_name character varying(600) COLLATE pg_catalog."default",
+    src_customer_job_desc character varying(400) COLLATE pg_catalog."default",
+    dst_customer_job_desc character varying(400) COLLATE pg_catalog."default",
+    initial_src_customer_id numeric(10,0),
+    transaction_reference character varying(4000) COLLATE pg_catalog."default",
+    card_id numeric(10,0),
+    posting_failure_reason_desc character varying(1500) COLLATE pg_catalog."default",
+    psycho_rule_value numeric,
+    phone_no character varying(60) COLLATE pg_catalog."default",
+    settler_name character varying(240) COLLATE pg_catalog."default",
+    job_id numeric(10,0),
+    reason_id numeric(10,0),
+    dst_reason_id numeric(10,0),
+    loan_duration numeric,
+    lgcy_approved_transaction_amnt numeric,
+    lgcy_approved_loan_duration numeric,
+    dst_card_id numeric(10,0),
+    service_code numeric(5,0),
+    lgcy_inv_serial_no character varying(60) COLLATE pg_catalog."default",
+    lgcy_con_code numeric,
+    lgcy_invoice_date date,
+    lgcy_phone_no_status character varying(40) COLLATE pg_catalog."default",
+    lgcy_initial_customer_name character varying(800) COLLATE pg_catalog."default",
+    is_paid character varying(1) COLLATE pg_catalog."default",
+    membership_year character varying(40) COLLATE pg_catalog."default",
+    account_id numeric(10,0),
+    lgcy_payment_type_id numeric(10,0),
+    ven_p_id numeric(10,0),
+    itm_p_id numeric(10,0),
+    tech_transaction_type numeric(5,0),
+    service_type_code numeric(5,0),
+    service_type_number numeric,
+    initial_dst_customer_name character varying(240) COLLATE pg_catalog."default",
+    funds_source_code numeric(5,0),
+    city_name character varying(1200) COLLATE pg_catalog."default",
+    branch_internal_code character varying(480) COLLATE pg_catalog."default",
+    section_name character varying(1200) COLLATE pg_catalog."default",
+    water_meter_nbr numeric,
+    water_cost_amount numeric,
+    maintenance_cost_amount numeric,
+    sewage_cost_amount numeric,
+    total_penalty_amount numeric,
+    currency_denomination_amount numeric,
+    penalty_discount_amount numeric,
+    tech_receipt_content bytea,
+    item_psycho_rule_value numeric,
+    lgcy_ven_transaction_code character varying(400) COLLATE pg_catalog."default",
+    tax_period_bdate date,
+    tax_period_edate date,
+    validation_nbr character varying(60) COLLATE pg_catalog."default",
+    registration_nb character varying(80) COLLATE pg_catalog."default",
+    invoice_nbr numeric,
+    schedule_nbr character varying(80) COLLATE pg_catalog."default",
+    tax_id numeric(10,0),
+    submission_nbr character varying(80) COLLATE pg_catalog."default",
+    tax_nbr character varying(80) COLLATE pg_catalog."default",
+    event_desc character varying(1020) COLLATE pg_catalog."default",
+    submission_status numeric(5,0),
+    comments2 character varying(400) COLLATE pg_catalog."default",
+    property_id numeric(10,0),
+    unit_no numeric,
+    soc_registration_no character varying(80) COLLATE pg_catalog."default",
+    job_registration_no character varying(80) COLLATE pg_catalog."default",
+    payment_expiry_date date,
+    has_vehicule_book character varying(1) COLLATE pg_catalog."default" NOT NULL DEFAULT '0'::character varying,
+    has_insurance_con character varying(1) COLLATE pg_catalog."default" NOT NULL DEFAULT '0'::character varying,
+    has_insurance_receipt character varying(1) COLLATE pg_catalog."default" NOT NULL DEFAULT '0'::character varying,
+    has_approval character varying(1) COLLATE pg_catalog."default" NOT NULL DEFAULT '0'::character varying,
+    transaction_amnt_desc character varying(1020) COLLATE pg_catalog."default",
+    insurance_vignette_no character varying(20) COLLATE pg_catalog."default",
+    insurance_con_code character varying(40) COLLATE pg_catalog."default",
+    insurance_con_bdate date,
+    fiscal_stamp_value numeric,
+    vignette_no character varying(20) COLLATE pg_catalog."default",
+    insurance_con_end_date date,
+    soc_id numeric(10,0),
+    equipment_id numeric(10,0),
+    education_faculty_id numeric(10,0),
+    location_id numeric(10,0),
+    doc_no character varying(160) COLLATE pg_catalog."default",
+    doc_validation_no character varying(80) COLLATE pg_catalog."default",
+    block_no character varying(200) COLLATE pg_catalog."default",
+    transaction_mobile_no character varying(60) COLLATE pg_catalog."default",
+    settler_title numeric(5,0),
+    payment_due_date date,
+    subdiv_code numeric(10,0),
+    cou_id numeric(10,0),
+    country_region_id numeric(10,0),
+    tax_reduction_amount numeric,
+    penalty_reduction_amount numeric,
+    payment_year numeric,
+    delay_payment_penalty_amnt numeric,
+    delay_pay_pnalty_discount_amnt numeric,
+    schedule_year numeric,
+    schedule_nbr_desc character varying(200) COLLATE pg_catalog."default",
+    schedule_nbr_bdate character varying(30) COLLATE pg_catalog."default",
+    lgcy_request_id character varying(300) COLLATE pg_catalog."default",
+    annual_income numeric,
+    annual_charge numeric,
+    tech_receipt_no character varying(60) COLLATE pg_catalog."default",
+    education_schl_id numeric(10,0),
+    is_automatic_paid character varying(1) COLLATE pg_catalog."default" NOT NULL DEFAULT '0'::character varying,
+    vignette_delivery_place_code numeric(5,0),
+    vignette_serial_no character varying(18) COLLATE pg_catalog."default",
+    e_vignette_tracking_no character varying(12) COLLATE pg_catalog."default",
+    submission_emp_id numeric(10,0),
+    delivery_batch_code character varying(40) COLLATE pg_catalog."default",
+    e_vignette_voucher_no bytea,
+    tech_ws_initial_payment_date character varying(720) COLLATE pg_catalog."default",
+    promo_prc_rl_id numeric(10,0),
+    bank_code numeric,
+    revised_transaction_amnt numeric,
+    revised_psycho_rule_value numeric,
+    is_screening_required character varying(1) COLLATE pg_catalog."default" NOT NULL DEFAULT '1'::character varying,
+    delivery_service_desc character varying(400) COLLATE pg_catalog."default",
+    converted_cur_id numeric(10,0),
+    has_reprint_approval character varying(1) COLLATE pg_catalog."default" NOT NULL DEFAULT '0'::character varying,
+    rel_itm_id numeric(10,0),
+    itm_denomination character varying(80) COLLATE pg_catalog."default",
+    itm_price numeric,
+    itm_commision numeric,
+    voucher_no character varying(100) COLLATE pg_catalog."default",
+    purchase_reference_no character varying(100) COLLATE pg_catalog."default",
+    reprint_request_date date,
+    lgcy_compny_item_ven_denom_id numeric(10,0),
+    source_cur_transaction_amnt numeric,
+    source_cur_id numeric(10,0),
+    data_source numeric(5,0),
+    min_transaction_amnt numeric,
+    max_transaction_amnt numeric,
+    comments4 character varying(255) COLLATE pg_catalog."default",
+    comments3 character varying(400) COLLATE pg_catalog."default",
+    counter_no character varying(80) COLLATE pg_catalog."default",
+    record_no character varying(80) COLLATE pg_catalog."default",
+    first_scan_desc character varying(400) COLLATE pg_catalog."default",
+    second_scan_desc character varying(400) COLLATE pg_catalog."default",
+    first_consumption_desc character varying(400) COLLATE pg_catalog."default",
+    property_adr_desc character varying(1020) COLLATE pg_catalog."default",
+    counter_charge_amnt numeric,
+    temp_renewal_sbsrptn_charge numeric,
+    mechanization_charge_amount numeric,
+    subscription_type numeric(5,0),
+    database_id numeric(10,0),
+    city_id numeric(10,0),
+    second_consumption_desc character varying(400) COLLATE pg_catalog."default",
+    add_consumption_charge_amnt numeric,
+    dst_merchan_code character varying(100) COLLATE pg_catalog."default",
+    bsn_grp_global_info_date_id numeric(10,0),
+    reduction_amnt numeric,
+    lgcy_emp_code character varying(400) COLLATE pg_catalog."default",
+    subscription_bdate character varying(80) COLLATE pg_catalog."default",
+    subscription_edate character varying(80) COLLATE pg_catalog."default",
+    wedding_list_id numeric(10,0),
+    lgcy_daily_ccv_rate numeric,
+    fresh_card_id numeric(10,0),
+    vun_number character varying(80) COLLATE pg_catalog."default",
+    receipt_type character varying(80) COLLATE pg_catalog."default",
+    vehicule_color character varying(80) COLLATE pg_catalog."default",
+    license_no character varying(80) COLLATE pg_catalog."default",
+    lgcy_transaction_charges character varying(4000) COLLATE pg_catalog."default",
+    returned_charge_amnt character varying(80) COLLATE pg_catalog."default",
+    lgcy_receipt_no character varying(60) COLLATE pg_catalog."default",
+    lgcy_ven_receipt_no character varying(60) COLLATE pg_catalog."default",
+    lgcy_customer_card_nbr character varying(100) COLLATE pg_catalog."default",
+    tech_src_transaction_amnt text COLLATE pg_catalog."default",
+    tech_total_transaction_amnt numeric,
+    tech_dst_transaction_amnt numeric,
+    tech_dst_cou_name character varying(100) COLLATE pg_catalog."default",
+    lgcy_soc_name character varying(100) COLLATE pg_catalog."default",
+    tech_total_charge_amnt numeric(10,0),
+    tech_collected_amnt_desc character varying(255) COLLATE pg_catalog."default",
+    tech_discount_amnt numeric(10,0),
+    tech_lgcy_charge_type_desc character varying(50) COLLATE pg_catalog."default",
+    equipment_number numeric,
+    CONSTRAINT pk_transaction PRIMARY KEY (transaction_id)
+        USING INDEX TABLESPACE vcis_data,
+    CONSTRAINT fk_fin_trans_wed_list_id FOREIGN KEY (wedding_list_id)
+        REFERENCES sdedba.ref_com_wedding_list (wedding_list_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_fin_trx_fresh_card_id FOREIGN KEY (fresh_card_id)
+        REFERENCES sdedba.ref_card_info (card_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trans_itm_p_id FOREIGN KEY (itm_p_id)
+        REFERENCES sdedba.ref_item (itm_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trans_ven_p_id FOREIGN KEY (ven_p_id)
+        REFERENCES sdedba.ref_ven_vendor (ven_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_transaction_card_id FOREIGN KEY (card_id)
+        REFERENCES sdedba.ref_card_info (card_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trns_acc_id FOREIGN KEY (account_id)
+        REFERENCES findba.fin_account_info (account_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trns_edu_fac_id FOREIGN KEY (education_faculty_id, location_id)
+        REFERENCES sdedba.ref_hr_educ_faculty_location (education_faculty_id, location_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trns_equp_id FOREIGN KEY (equipment_id)
+        REFERENCES invdba.inv_equipment (equipment_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trns_pay_tp_id FOREIGN KEY (lgcy_payment_type_id)
+        REFERENCES sdedba.ref_com_payment_type (payment_type_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trns_prp_id FOREIGN KEY (property_id)
+        REFERENCES sdedba.ref_ose_property (property_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trns_soc_id FOREIGN KEY (soc_id)
+        REFERENCES sdedba.ref_ose_company (soc_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_bsngp_id FOREIGN KEY (bsn_group_id)
+        REFERENCES mdmdba.mdm_bsn_unit_group (bsn_group_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_cur_cnv_ftr FOREIGN KEY (cur_cnv_future_id)
+        REFERENCES sdedba.ref_com_cur_cnv_future (cur_cnv_future_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_cur_id FOREIGN KEY (cur_id)
+        REFERENCES sdedba.ref_com_currency (cur_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_dst_bsn_grp FOREIGN KEY (dst_bsn_group_id)
+        REFERENCES mdmdba.mdm_bsn_unit_group (bsn_group_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_dst_card_id FOREIGN KEY (dst_card_id)
+        REFERENCES sdedba.ref_card_info (card_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_dstreason_id FOREIGN KEY (dst_reason_id)
+        REFERENCES sdedba.ref_com_reason (reason_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_in_src_cust_id FOREIGN KEY (initial_src_customer_id)
+        REFERENCES sdedba.ref_customer (customer_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_itm_id FOREIGN KEY (itm_id)
+        REFERENCES sdedba.ref_item (itm_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_job_id FOREIGN KEY (job_id)
+        REFERENCES hrdba.hr_job (job_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_reason_id FOREIGN KEY (reason_id)
+        REFERENCES sdedba.ref_com_reason (reason_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_src_cust_id FOREIGN KEY (src_customer_id)
+        REFERENCES sdedba.ref_customer (customer_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_sts_cod FOREIGN KEY (status_code)
+        REFERENCES sdedba.sts_status (status_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trnsctn_ven_id FOREIGN KEY (ven_id)
+        REFERENCES sdedba.ref_ven_vendor (ven_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_bsn_grp FOREIGN KEY (bsn_grp_global_info_date_id)
+        REFERENCES mdmdba.mdm_bsn_grp_global_info_date (bsn_grp_global_info_date_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_city_id FOREIGN KEY (city_id)
+        REFERENCES sdedba.ref_com_city (city_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_cntry_reg_id FOREIGN KEY (country_region_id)
+        REFERENCES sdedba.ref_com_country_region (country_region_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_conv_cur_id FOREIGN KEY (converted_cur_id)
+        REFERENCES sdedba.ref_com_currency (cur_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_database_id FOREIGN KEY (database_id)
+        REFERENCES suitedba.cfg_database_def (database_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_lgcy_itm_ven_denom_id FOREIGN KEY (lgcy_compny_item_ven_denom_id)
+        REFERENCES sdedba.ref_lgcy_compny_item_ven_denom (lgcy_compny_item_ven_denom_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_promo_prc_rl FOREIGN KEY (promo_prc_rl_id)
+        REFERENCES csrdba.promo_prc_rl (promo_prc_rl_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_rel_itm_id FOREIGN KEY (rel_itm_id)
+        REFERENCES sdedba.ref_item (itm_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_src_cur_id FOREIGN KEY (source_cur_id)
+        REFERENCES sdedba.ref_com_currency (cur_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_sub_emp_id FOREIGN KEY (submission_emp_id)
+        REFERENCES usmdba.usm_user (emp_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_subdiv_cou_id FOREIGN KEY (cou_id, subdiv_code)
+        REFERENCES sdedba.ref_com_country_division (cou_id, subdiv_code) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT fk_trs_tax_id FOREIGN KEY (tax_id)
+        REFERENCES mdmdba.mdm_tax (tax_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT pk_trs_edu_schl_id FOREIGN KEY (education_schl_id)
+        REFERENCES sdedba.ref_hr_education_school (education_schl_id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE vdps_data;
+
+ALTER TABLE IF EXISTS findba.fin_transaction
+    OWNER to pgdba;
+-- Index: fin_transaction_transaction_date_idx
+
+-- DROP INDEX IF EXISTS findba.fin_transaction_transaction_date_idx;
+
+CREATE INDEX IF NOT EXISTS fin_transaction_transaction_date_idx
+    ON findba.fin_transaction USING btree
+    (transaction_date ASC NULLS LAST)
+    TABLESPACE vcis_data;
+-- Index: ven_itm
+
+-- DROP INDEX IF EXISTS findba.ven_itm;
+
+CREATE INDEX IF NOT EXISTS ven_itm
+    ON findba.fin_transaction USING btree
+    (ven_id ASC NULLS LAST, itm_id ASC NULLS LAST)
+    TABLESPACE vcis_data;

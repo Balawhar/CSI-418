@@ -1,0 +1,39 @@
+
+-- pgusers
+
+-- DROP ROLE pguser;
+
+CREATE ROLE pguser WITH 
+	NOSUPERUSER
+	NOCREATEDB
+	NOCREATEROLE
+	INHERIT
+	LOGIN
+	NOREPLICATION
+	NOBYPASSRLS
+	CONNECTION LIMIT -1
+	VALID UNTIL '2024-12-31 00:00:00+02';
+
+GRANT pg_read_all_data TO pguser;
+
+--
+
+-- DROP ROLE pgdba;
+
+CREATE ROLE pgdba WITH 
+	NOSUPERUSER
+	CREATEDB
+	CREATEROLE
+	INHERIT
+	LOGIN
+	NOREPLICATION
+	BYPASSRLS
+	CONNECTION LIMIT -1
+	VALID UNTIL '2024-12-31 00:00:00+02';
+
+GRANT pg_monitor TO pgdba;
+GRANT pg_read_all_data TO pgdba;
+GRANT pg_read_all_stats TO pgdba;
+GRANT pg_stat_scan_tables TO pgdba;
+GRANT pg_use_reserved_connections TO pgdba;
+GRANT pg_write_all_data TO pgdba;

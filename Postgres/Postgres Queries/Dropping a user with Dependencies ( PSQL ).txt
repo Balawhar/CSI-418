@@ -1,0 +1,53 @@
+
+-- ############# DROP USER WITH DEPENDENCIES ############## --
+
+REASSIGN OWNED BY user1 TO pgdba;
+
+DROP OWNED BY user1;
+
+DROP USER user1;
+
+
+SELECT 'DROP TABLE ' || schemaname || '.' || tablename || ';'
+FROM pg_tables
+WHERE tableowner = 'user1'
+AND schemaname NOT IN ('pg_catalog', 'information_schema');
+
+SELECT 'DROP SEQUENCE ' || schemaname || '.' || sequencename || ';'
+FROM pg_sequences
+WHERE sequenceowner = 'user1';
+
+SELECT 'DROP VIEW ' || schemaname || '.' || viewname || ';'
+FROM pg_views
+WHERE viewowner = 'user1';
+
+
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM user1;
+
+
+SELECT *
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE c.relowner = (SELECT oid FROM pg_roles WHERE rolname = 'user1');
+
+
+
+SELECT *
+FROM pg_proc p
+JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE p.proowner = (SELECT oid FROM pg_roles WHERE rolname = 'user1');
+
+
+SELECT grantee, privilege_type, table_schema, table_name
+FROM information_schema.role_table_grants
+WHERE grantee = 'user1';
+
+
+
+SELECT *
+FROM pg_depend
+WHERE refobjid = (SELECT oid FROM pg_roles WHERE rolname = 'user1');
+
+
+
+
