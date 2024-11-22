@@ -1,0 +1,15 @@
+
+-- SSH key ( Valoores PC && Github )
+
+
+ssh-keygen -t ed25519 -C "Balawharak@gmail.com"
+
+SHA256:v/hjZd6kwkFZkrL4Be1Yv8nDzqPeQxLho+yXo8Ufxjc Balawharak@gmail.com
+
+
+C:\Users\albalawhar\1.pub
+
+Key:
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHw69NgRln/AreeIjKIFgE7ao0kIF5Gm/558O9KJBq25 Balawharak@gmail.com
+
+Name on Github: My PC Valoores

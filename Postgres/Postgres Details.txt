@@ -90,6 +90,22 @@ v21-dsp-1.0.0.log
 =======================================================================================
 
 -- Start Postgres Server with pg_ctl
+
+-- Start
+/usr/lib/postgresql/17/bin/pg_ctl -D /u01/pgsql/17/data -l logfile start
+
+-- Stop
+/usr/lib/postgresql/17/bin/pg_ctl -D /u01/pgsql/17/data -l logfile stop
+
+-- restart_postgresql_service.sh
+sudo systemctl daemon-reload
+sudo systemctl stop postgresql.service
+sudo systemctl start postgresql.service
+sudo systemctl enable postgresql.service
+sudo systemctl status postgresql.service
+
+---------------------------------------------------------
+
 pg_ctl restart -D /u01/pgsql/16/data -l /u01/pgsql/16/data/log/postgresql-Start-log
 
 pg_ctl status -D /u01/pgsql/16/data
